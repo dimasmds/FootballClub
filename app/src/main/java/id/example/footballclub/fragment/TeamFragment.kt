@@ -1,30 +1,41 @@
-package id.example.footballclub.activity
+package id.example.footballclub.fragment
 
+
+import android.content.Context
 import android.os.Bundle
+import android.support.v4.app.Fragment
 import android.support.v4.widget.SwipeRefreshLayout
-import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.*
 import com.google.gson.Gson
+
 import id.example.footballclub.R
 import id.example.footballclub.R.color.colorAccent
-import id.example.footballclub.`interface`.MainView
+import id.example.footballclub.`interface`.TeamView
 import id.example.footballclub.adapter.MainAdapter
-import id.example.footballclub.api.APIRepository
 import id.example.footballclub.model.Team
-import id.example.footballclub.presenter.MainPresenter
+import id.example.footballclub.presenter.TeamPresenter
 import org.jetbrains.anko.*
 import org.jetbrains.anko.recyclerview.v7.recyclerView
+import org.jetbrains.anko.support.v4.ctx
 import org.jetbrains.anko.support.v4.swipeRefreshLayout
+import id.example.footballclub.api.APIRepository
 
-class MainActivity : AppCompatActivity(), MainView {
+
+/**
+ * A simple [Fragment] subclass.
+ */
+class TeamFragment : Fragment(), AnkoComponent<Context>, TeamView {
+
 
 
 
     private var teams: MutableList<Team> = mutableListOf()
-    private lateinit var presenter : MainPresenter
+    private lateinit var presenter : TeamPresenter
     private lateinit var adapter : MainAdapter
     private lateinit var listTeam: RecyclerView
     private lateinit var progressBar: ProgressBar
@@ -33,11 +44,38 @@ class MainActivity : AppCompatActivity(), MainView {
     private lateinit var leagueName : String
 
 
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+        val spinnerItems = resources.getStringArray(R.array.league)
+        val spinnerAdapter = ArrayAdapter(ctx, android.R.layout.simple_spinner_dropdown_item, spinnerItems)
+        spinner.adapter = spinnerAdapter
+
+        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
+                leagueName = spinner.selectedItem.toString()
+                presenter.getTeamList(leagueName)
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+
+        adapter = MainAdapter(teams)
+        listTeam.adapter = adapter
+
+        val requset = APIRepository()
+        val gson = Gson()
+        presenter = TeamPresenter(this, requset, gson)
+    }
 
 
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+                              savedInstanceState: Bundle?): View? {
+        return createView(AnkoContext.create(ctx))
+    }
+
+
+    override fun createView(ui: AnkoContext<Context>): View = with(ui) {
         linearLayout {
             lparams (width = matchParent, height = wrapContent)
             orientation = LinearLayout.VERTICAL
@@ -67,27 +105,8 @@ class MainActivity : AppCompatActivity(), MainView {
                 }
             }
         }
-
-        val spinnerItems = resources.getStringArray(R.array.league)
-        val spinnerAdapter = ArrayAdapter(ctx, android.R.layout.simple_spinner_dropdown_item, spinnerItems)
-        spinner.adapter = spinnerAdapter
-
-        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
-                leagueName = spinner.selectedItem.toString()
-                presenter.getTeamList(leagueName)
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>?) {}
-        }
-
-        adapter = MainAdapter(teams)
-        listTeam.adapter = adapter
-
-        val requset = APIRepository()
-        val gson = Gson()
-        presenter = MainPresenter(this, requset, gson)
     }
+
 
     override fun showLoading() {
         progressBar.visibility = View.VISIBLE
@@ -103,4 +122,5 @@ class MainActivity : AppCompatActivity(), MainView {
         teams.addAll(data)
         adapter.notifyDataSetChanged()
     }
-}
+
+}// Required empty public constructor

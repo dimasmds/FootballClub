@@ -13,8 +13,8 @@ import org.jetbrains.anko.*
 import id.example.footballclub.R
 
 /**
- * Created by dimassaputra on 8/13/18.
- */
+* Created by dimassaputra on 8/13/18.
+*/
 class MainAdapter (private val teams : List<Team>) : RecyclerView.Adapter<TeamViewHolder>() {
 
     override fun onBindViewHolder(holder: TeamViewHolder, position: Int) {
