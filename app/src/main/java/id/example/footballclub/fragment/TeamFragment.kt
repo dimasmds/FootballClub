@@ -16,9 +16,10 @@ import com.google.gson.Gson
 import id.example.footballclub.R
 import id.example.footballclub.R.color.colorAccent
 import id.example.footballclub.`interface`.TeamView
-import id.example.footballclub.adapter.MainAdapter
+import id.example.footballclub.adapter.TeamsAdapter
 import id.example.footballclub.model.Team
 import id.example.footballclub.presenter.TeamPresenter
+import id.example.footballclub.activity.TeamDetailActivity
 import org.jetbrains.anko.*
 import org.jetbrains.anko.recyclerview.v7.recyclerView
 import org.jetbrains.anko.support.v4.ctx
@@ -36,7 +37,7 @@ class TeamFragment : Fragment(), AnkoComponent<Context>, TeamView {
 
     private var teams: MutableList<Team> = mutableListOf()
     private lateinit var presenter : TeamPresenter
-    private lateinit var adapter : MainAdapter
+    private lateinit var adapter : TeamsAdapter
     private lateinit var listTeam: RecyclerView
     private lateinit var progressBar: ProgressBar
     private lateinit var swipeRefresh: SwipeRefreshLayout
@@ -60,7 +61,9 @@ class TeamFragment : Fragment(), AnkoComponent<Context>, TeamView {
             override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
 
-        adapter = MainAdapter(teams)
+        adapter = TeamsAdapter(teams) {
+            ctx.startActivity<TeamDetailActivity>("id" to "${it.teamId}")
+        }
         listTeam.adapter = adapter
 
         val requset = APIRepository()

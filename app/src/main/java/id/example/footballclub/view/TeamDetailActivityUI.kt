@@ -3,20 +3,20 @@ package id.example.footballclub.view
 import android.view.Gravity
 import android.widget.ImageView
 import android.widget.TextView
-import id.example.footballclub.activity.ClubActivity
+import id.example.footballclub.activity.TeamDetailActivity
 import org.jetbrains.anko.*
 
 /**
 * Created by dimassaputra on 8/9/18.
 */
 
-class ClubActivityUI : AnkoComponent<ClubActivity> {
+class TeamDetailActivityUI : AnkoComponent<TeamDetailActivity> {
 
     lateinit var imgView : ImageView
     lateinit var txtName : TextView
     lateinit var txtDesc : TextView
 
-    override fun createView(ui: AnkoContext<ClubActivity>) = with(ui) {
+    override fun createView(ui: AnkoContext<TeamDetailActivity>) = with(ui) {
         verticalLayout {
             padding = dip(10)
             verticalLayout {
