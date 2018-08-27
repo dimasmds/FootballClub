@@ -5,6 +5,9 @@ import id.example.footballclub.`interface`.TeamView
 import id.example.footballclub.api.APIRepository
 import id.example.footballclub.api.TheSportDBApi
 import id.example.footballclub.model.TeamResponse
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.async
+import org.jetbrains.anko.coroutines.experimental.bg
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 
@@ -17,15 +20,15 @@ class TeamPresenter(private val view : TeamView,
 
     fun getTeamList(league: String?){
         view.showLoading()
-        doAsync {
-            val data = gson.fromJson(apiRepository.doRequest(TheSportDBApi.getTeams(league)),
-                    TeamResponse::class.java
-            )
-
-            uiThread {
-                view.hideLoading()
-                view.showTeamList(data.teams)
+        async(UI){
+            val data = bg {
+                gson.fromJson(apiRepository
+                        .doRequest(TheSportDBApi.getTeams(league)),
+                        TeamResponse::class.java
+                )
             }
+            view.showTeamList(data.await().teams)
+            view.hideLoading()
         }
     }
 }
